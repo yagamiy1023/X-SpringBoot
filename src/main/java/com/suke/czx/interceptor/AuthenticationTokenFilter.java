@@ -36,7 +36,7 @@ public class AuthenticationTokenFilter extends BasicAuthenticationFilter {
     private AuthIgnoreConfig authIgnoreConfig;
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public AuthenticationTokenFilter(AuthenticationManager authenticationManager, AuthIgnoreConfig authIgnoreConfig,RedisTemplate template) {
+    public AuthenticationTokenFilter(AuthenticationManager authenticationManager, AuthIgnoreConfig authIgnoreConfig, RedisTemplate template) {
         super(authenticationManager);
         this.redisTemplate = template;
         this.authIgnoreConfig = authIgnoreConfig;
@@ -44,6 +44,7 @@ public class AuthenticationTokenFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+
         String token = request.getHeader(Constant.TOKEN);
         if (StrUtil.isBlank(token) || StrUtil.equals(token, "null")) {
             token = request.getParameter(Constant.TOKEN);
@@ -51,7 +52,7 @@ public class AuthenticationTokenFilter extends BasicAuthenticationFilter {
 
         if (StrUtil.isNotBlank(token) && !StrUtil.equals(token, "null")) {
             final String requestURI = request.getRequestURI();
-            if(!authIgnoreConfig.isContains(requestURI)){
+            if (!authIgnoreConfig.isContains(requestURI)) {
                 Object userInfo = redisTemplate.opsForValue().get(Constant.AUTHENTICATION_TOKEN + token);
                 if (ObjectUtil.isNull(userInfo)) {
                     writer(response, "无效token");
